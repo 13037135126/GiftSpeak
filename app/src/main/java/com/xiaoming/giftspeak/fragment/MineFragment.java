@@ -25,13 +25,14 @@ import java.util.List;
  */
 public class MineFragment extends Fragment{
 
-    private View view;
+
     private TabLayout tabLayout;
     private String []tabName={"单品","攻略"};
     private List<Fragment> mFragmentList = new ArrayList<>();
     private int curIndex;
     private LinearLayout linearLayout;
     private ImageView ivLogin;
+    private View view;
 
     public static MineFragment newInstance(Bundle args){
         MineFragment fragment=new MineFragment();
@@ -48,13 +49,11 @@ public class MineFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.fragment_mine,null);
-        //tabLayout的初始化
-        tabLayout= (TabLayout) view.findViewById(R.id.tb_two_title);
-        linearLayout= (LinearLayout) view.findViewById(R.id.ll_ll);linearLayout= (LinearLayout) view.findViewById(R.id.ll_ll);
-        ivLogin= (ImageView) view.findViewById(R.id.iv_sign);
+
+
         initData();
         initView();
-        initListener();
+
 
         return view;
     }
@@ -67,27 +66,12 @@ public class MineFragment extends Fragment{
 
 
     private void initView() {
-
+        ivLogin= (ImageView) view.findViewById(R.id.iv_message);
     }
 
     private void initData() {
 
-            }
-
-
-
-
-
-    private void initListener() {
-        linearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (getId()){
-                    case R.id.iv_sign:
-                        Intent intent=new Intent(getActivity(), LoginActivity.class);
-                    break;
-                }
-            }
-        });
     }
+
+
 }

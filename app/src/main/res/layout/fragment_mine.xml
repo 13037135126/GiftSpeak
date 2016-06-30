@@ -1,7 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:id="@+id/ll_ll"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_profile"/>
+        <ImageView
+            android:id="@+id/iv_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_message"
+            android:layout_margin="20dp"
+            android:onClick="onOpenLogin"/>
+        <ImageView
+            android:id="@+id/iv_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/me_settings"
+            android:layout_margin="20dp"
+            android:layout_alignParentEnd="true" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_scan"
+            android:layout_alignTop="@id/iv_message"
+            android:layout_toStartOf="@+id/iv_setting" />
+        <ImageView
+            android:id="@+id/iv_user_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/me_avatar_boy"
+            android:layout_centerInParent="true"
+            android:onClick="OpenLogin"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="未登录"
+            android:textSize="18sp"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/iv_user_pic"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="90dp"/>
+    </RelativeLayout>
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/rb_cart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:text="指南"
+            android:gravity="center"
+            android:drawableTop="@drawable/icon_cart"
+            android:checked="false"
+            android:onClick="OpenLogin"/>
+        <RadioButton
+            android:id="@+id/rb_order"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:text="订单"
+            android:gravity="center"
+            android:drawableTop="@drawable/icon_order"
+            android:checked="false"
+            android:onClick="OpenLogin"/>
+        <RadioButton
+            android:id="@+id/rb_coupon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:text="礼券"
+            android:gravity="center"
+            android:drawableTop="@drawable/icon_coupon"
+            android:checked="false"
+            android:onClick="OpenLogin"/>
+        <RadioButton
+            android:id="@+id/rb_service"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:text="客服"
+            android:gravity="center"
+            android:drawableTop="@drawable/icon_service"
+            android:checked="false"
+            android:onClick="OpenLogin"/>
+    </RadioGroup>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="#E6E6E6"/>
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tb_two_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </android.support.design.widget.TabLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp">
+        <ImageView
+            android:id="@+id/iv_my_like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/fav_me_blank"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            />
+        <TextView
+            android:id="@+id/tv_click_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="喜欢的礼物摆在这里"
+            android:layout_below="@id/iv_my_like"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"/>
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_mine"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+
+</LinearLayout>
