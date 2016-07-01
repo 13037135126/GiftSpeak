@@ -1,5 +1,6 @@
 package com.xiaoming.giftspeak.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,9 +15,15 @@ import com.xiaoming.giftspeak.R;
  */
 public class OthersFragment extends Fragment{
 
-    public static OthersFragment newInstance(){
+    public static OthersFragment newInstance(Bundle args){
         OthersFragment fragment=new OthersFragment();
+        fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
     }
 
     @Override
@@ -24,9 +31,5 @@ public class OthersFragment extends Fragment{
         super.onCreate(savedInstanceState);
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_well_chosen,container,false);
-    }
+
 }

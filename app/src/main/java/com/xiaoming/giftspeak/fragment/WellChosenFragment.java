@@ -4,20 +4,27 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
+import com.bigkoo.convenientbanner.holder.Holder;
+import com.google.gson.Gson;
+import com.bigkoo.convenientbanner.ConvenientBanner;
+import com.squareup.picasso.Picasso;
 import com.xiaoming.giftspeak.R;
+import com.xiaoming.giftspeak.bean.BannerInfo;
+import com.xiaoming.giftspeak.constant.UrlConfig;
+import com.xiaoming.giftspeak.utils.IOKCallBack;
+import com.xiaoming.giftspeak.utils.OkHttpTool;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,186 +37,139 @@ public class WellChosenFragment extends Fragment{
     private View view;
     @BindView(R.id.wellchosen_list)
     ExpandableListView expandableListView;
-
     private Context mContext;
-    private Map<String,List<String>>datas=new HashMap<>();
-    private List<String>groupNameDatas=new ArrayList<>();
-    private MyExpandListAdapter myExpandListAdapter;
+    HeaderViewHolder headerViewHolder;
+    private List<BannerInfo.DataBean.BannersBean> imageDatas = new ArrayList<>();
+    public HeaderRVAdapter headerRVAdapter;
 
-    public static WellChosenFragment newInstance(){
+    public static WellChosenFragment newInstance(Bundle args){
         WellChosenFragment fragment=new WellChosenFragment();
-//        Bundle args = new Bundle();
-//        fragment.setArguments(args);
+        fragment.setArguments(args);
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mContext=getActivity();
-    }
-
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.fragment_well_chosen,container,false);
         ButterKnife.bind(this,view);
+        setupHeaderView();
         setupExpandListView();
         return view;
     }
 
-    /**
-     * 初始化ExpandListView
-     */
-    private void setupExpandListView() {
-        //1、创建数据源
-        setupDatas();
-        //2、创建适配器
-        myExpandListAdapter=new MyExpandListAdapter();
-        //3、关联适配器
-        expandableListView.setAdapter(myExpandListAdapter);
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
 
-        //设置ExpandableListView点击不收缩
-        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    //添加头部视图
+    private void setupHeaderView() {
+        View headerView=LayoutInflater.from(mContext).inflate(R.layout.fragment_header_view,null);
+        headerViewHolder=new HeaderViewHolder(headerView);
+        setupHeaderRecyclerView(headerViewHolder);
+        //动态加载数据
+        loadBannerDatas();
+        setupBanner(headerViewHolder);
+        expandableListView.addHeaderView(headerView);
+    }
+
+    private void loadBannerDatas() {
+        OkHttpTool.newInstance().start(UrlConfig.BANNER_URL).callback(new IOKCallBack() {
             @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                return true;
+            public void success(String result) {
+                Gson gson=new Gson();
+                BannerInfo bannerInfo=gson.fromJson(result,BannerInfo.class);
+                imageDatas.addAll(bannerInfo.getData().getBanners());
+                headerViewHolder.convenientBanner.getViewPager().getAdapter().notifyDataSetChanged();
             }
         });
-        //默认所有的Group全部展开
-        for (int i = 0; i <groupNameDatas.size() ; i++) {
-            expandableListView.expandGroup(i);
+    }
+
+    private void setupBanner(HeaderViewHolder headerViewHolder) {
+
+        headerViewHolder.convenientBanner.setPages(new CBViewHolderCreator<HeaderBannerViewHolder>(){
+            @Override
+            public HeaderBannerViewHolder createHolder() {
+                return new HeaderBannerViewHolder();
+            }
+        },imageDatas)
+                .setPageIndicator(new int[]{R.drawable.btn_check_disabled_nightmode,R.drawable.btn_check_normal})
+                .setPageIndicatorAlign(ConvenientBanner.PageIndicatorAlign.CENTER_HORIZONTAL);
+    }
+
+    class HeaderBannerViewHolder implements Holder<BannerInfo.DataBean.BannersBean>{
+        ImageView imageView;
+
+        @Override
+        public View createView(Context context) {
+            imageView=new ImageView(context);
+            return imageView;
+        }
+        @Override
+        public void UpdateUI(Context context, int position, BannerInfo.DataBean.BannersBean data) {
+            Picasso.with(mContext).load(data.getImage_url()).into(imageView);
         }
     }
 
-    private void setupDatas() {
-        if(groupNameDatas!=null && !groupNameDatas.isEmpty()){
-                return;
-        }
-        for (int i = 0; i < 5; i++) {
-            String groupName="GROUP"+i;
-            groupNameDatas.add(groupName);
-            ArrayList<String>childListData=new ArrayList<>();
-            datas.put(groupName,childListData);
-            for (int j = 0; j <4 ; j++) {
-                childListData.add("CHILD"+j);
-            }
+    /**
+     * 初始化头部RecyclerView
+     * @param headerViewHolder
+     */
+    private void setupHeaderRecyclerView(HeaderViewHolder headerViewHolder) {
+        //创建布局管理器
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(mContext,LinearLayoutManager.HORIZONTAL,false);
+        headerViewHolder.mRecyclerView.setLayoutManager(linearLayoutManager);
+        //创建一个适配器
+        headerRVAdapter=new HeaderRVAdapter();
+        headerViewHolder.mRecyclerView.setAdapter(headerRVAdapter);
+
+    }
+
+    private void setupExpandListView() {
+
+    }
+
+    class HeaderViewHolder {
+        @BindView(R.id.header_view_rv)
+        RecyclerView mRecyclerView;
+        @BindView(R.id.header_view_cb)
+        ConvenientBanner convenientBanner;
+
+        public HeaderViewHolder(View headerView){
+            ButterKnife.bind(this,headerView);
         }
     }
 
-    class MyExpandListAdapter extends BaseExpandableListAdapter{
-
-        /**
-         * 返回分组的数量
-         * @return
-         */
-        @Override
-        public int getGroupCount() {
-            return groupNameDatas==null ? 0 : groupNameDatas.size();
+    private class HeaderRVViewHolder extends RecyclerView.ViewHolder{
+        public ImageView imageView;
+        public HeaderRVViewHolder(View itemView) {
+            super(itemView);
+            imageView= (ImageView) itemView;
         }
+    }
 
-        /**
-         * 返回每一组中的Item的个数
-         * @param groupPosition
-         * @return
-         */
+    //创建适配器
+    private class HeaderRVAdapter extends RecyclerView.Adapter<HeaderRVViewHolder>{
         @Override
-        public int getChildrenCount(int groupPosition) {
-            String key=groupNameDatas.get(groupPosition);
-            List<String>list=datas.get(key);
-            return list == null ? 0 : list.size();
+        public HeaderRVViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            ImageView imageView=new ImageView(mContext);
+            return new HeaderRVViewHolder(imageView);
         }
 
         @Override
-        public Object getGroup(int groupPosition) {
-            return groupNameDatas.get(groupPosition);
+        public void onBindViewHolder(HeaderRVViewHolder holder, int position) {
+            holder.imageView.setImageResource(R.mipmap.ic_launcher);
         }
 
         @Override
-        public Object getChild(int groupPosition, int childPosition) {
-            return null;
-        }
-
-        @Override
-        public long getGroupId(int groupPosition) {
-            return 0;
-        }
-
-        @Override
-        public long getChildId(int groupPosition, int childPosition) {
-            return 0;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        /**
-         * 创建分组的视图
-         * @param groupPosition
-         * @param isExpanded
-         * @param convertView
-         * @param parent
-         * @return
-         */
-        @Override
-        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-            View view=convertView;
-            GroupViewHolder groupViewHolder=null;
-            if(view==null){
-                view=LayoutInflater.from(mContext).inflate(R.layout.group_view,null);
-                groupViewHolder=new GroupViewHolder(view);
-            }else{
-                groupViewHolder= (GroupViewHolder) view.getTag();
-            }
-            groupViewHolder.mLeftTxt.setText("2016-6-27 星期一");
-            return view;
-        }
-
-        class GroupViewHolder{
-            @BindView(R.id.group_left_tv)
-            TextView mLeftTxt;
-            @BindView(R.id.group_right_tv)
-            TextView mRightTxt;
-            public GroupViewHolder(View view){
-                view.setTag(this);
-                ButterKnife.bind(this,view);
-            }
-        }
-
-        /**
-         * 创建分组中的Item视图
-         * @param groupPosition
-         * @param childPosition
-         * @param isLastChild
-         * @param convertView
-         * @param parent
-         * @return
-         */
-        @Override
-        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-            View view=convertView;
-            ChildViewHolder childViewHolder=null;
-            if(view == null){
-                view=LayoutInflater.from(mContext).inflate(R.layout.child_view,null);
-                childViewHolder=new ChildViewHolder(view);
-            }else{
-                childViewHolder= (ChildViewHolder) view.getTag();
-            }
-            return view;
-        }
-
-        class ChildViewHolder {
-            @BindView(R.id.child_image)
-            ImageView mImageView;
-            public ChildViewHolder(View view){
-                view.setTag(this);
-                ButterKnife.bind(this,view);
-            }
-        }
-        @Override
-        public boolean isChildSelectable(int groupPosition, int childPosition) {
-            return false;
+        public int getItemCount() {
+            return 4;
         }
     }
 

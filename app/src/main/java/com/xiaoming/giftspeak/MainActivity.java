@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 switch (checkedId){
                     case R.id.rb_guide:
+                            topName.setText("礼物说");
                             rlTop.setVisibility(View.VISIBLE);
                             ivSign.setVisibility(View.VISIBLE);
                             ivSearch.setVisibility(View.VISIBLE);

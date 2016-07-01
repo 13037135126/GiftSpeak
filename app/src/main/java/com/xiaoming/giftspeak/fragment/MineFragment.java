@@ -66,7 +66,7 @@ public class MineFragment extends Fragment{
 
 
     private void initView() {
-        ivLogin= (ImageView) view.findViewById(R.id.iv_message);
+
     }
 
     private void initData() {
